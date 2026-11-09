@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e1218">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Meu Trader Control</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📈</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;--bg:#05070b;--pn:#0e1218;--pn2:#151a22;--bd:#242b36;--tx:#e8ecf2;--mu:#8a94a3;--gn:#12e07a;--rd:#ff4d55;--bl:#4aa8ff;--am:#f2b83c;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--tx);font:400 14px/1.5 Poppins,system-ui,sans-serif;display:flex;min-height:100vh}
+aside{width:230px;flex:none;background:var(--pn);border-right:1px solid var(--bd);padding:20px 14px;position:sticky;top:0;height:100vh;display:flex;flex-direction:column;gap:6px}
+.logo{font-weight:700;font-size:18px;line-height:1.1;display:flex;gap:10px;align-items:center;margin-bottom:10px}
+.logo i{font-style:normal;font-size:28px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--mu);flex:none;margin-left:auto}
+.dot.ok{background:var(--gn)}.dot.sv{background:var(--am)}.dot.err{background:var(--rd)}
+.cur{display:flex;background:var(--bg);border:1px solid var(--bd);border-radius:99px;padding:3px;width:fit-content;margin-bottom:14px}
+.cur button{border:0;background:none;color:var(--mu);font:600 12px Poppins,sans-serif;padding:5px 14px;border-radius:99px;cursor:pointer}
+.cur button.on{background:var(--gn);color:#02130a}
+nav button{display:flex;gap:10px;align-items:center;width:100%;text-align:left;background:none;border:1px solid transparent;color:var(--mu);font:500 14px Poppins,sans-serif;padding:10px 12px;border-radius:10px;cursor:pointer}
+nav button.on{background:var(--pn2);border-color:var(--bd);color:var(--tx)}
+nav button:hover{color:var(--tx)}
+#who{margin-top:auto}#who.err{color:var(--rd)}
+main{flex:1;min-width:0;padding:28px 32px 60px;max-width:1200px}
+h1{font-size:26px;margin:0}
+.sub{color:var(--mu);margin:2px 0 18px}
+.card{background:var(--pn);border:1px solid var(--bd);border-radius:14px;padding:18px}
+.row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
+label{display:flex;flex-direction:column;gap:4px;font-size:12px;color:var(--mu);font-weight:500}
+input,select{background:var(--bg);border:1px solid var(--bd);color:var(--tx);border-radius:9px;padding:9px 11px;font:400 14px Poppins,sans-serif;min-width:140px}
+input:focus-visible,select:focus-visible,button:focus-visible{outline:2px solid var(--bl);outline-offset:1px}
+.btn{background:var(--pn2);border:1px solid var(--bd);color:var(--tx);border-radius:9px;padding:9px 14px;font:500 14px Poppins,sans-serif;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}
+.btn:hover{border-color:var(--mu)}
+.btn.pri{background:var(--gn);color:#02130a;border-color:var(--gn);font-weight:600}
+.col{display:flex;flex-direction:column;gap:12px}
+.col input{width:100%}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));margin-top:14px}
+.k{border-top:3px solid var(--gn)}
+.k.b{border-top-color:var(--bl)}.k.r{border-top-color:var(--rd)}.k.a{border-top-color:var(--am)}
+.k small{color:var(--mu);font-size:11px;font-weight:600}
+.k b{display:block;font-size:26px;margin:4px 0 2px;overflow-wrap:anywhere}
+.k span{color:var(--mu);font-size:12px}
+.g{color:var(--gn)}.r{color:var(--rd)}
+.wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;min-width:520px}
+th{text-align:left;color:var(--mu);font-weight:500;font-size:12px;padding:10px;border-bottom:1px solid var(--bd)}
+td{padding:10px;border-bottom:1px solid var(--bd)}
+tr:last-child td{border-bottom:0}
+td.n,th.n{text-align:right}
+.x{background:none;border:0;color:var(--mu);cursor:pointer;font-size:16px;padding:4px 6px}.x:hover{color:var(--rd)}
+.empty{text-align:center;color:var(--mu);padding:28px}
+.two{display:grid;gap:14px;grid-template-columns:minmax(0,2fr) minmax(0,1fr);margin-top:14px}
+.donut{display:flex;flex-direction:column;align-items:center;gap:12px}
+.wl{display:flex;gap:10px;width:100%}.wl div{flex:1;text-align:center;background:var(--bg);border:1px solid var(--bd);border-radius:10px;padding:8px}
+.wl small{display:block;color:var(--mu);font-size:11px}.wl b{font-size:22px}
+.note{color:var(--mu);font-size:12px;margin-top:12px}
+.note ol{padding-left:18px;margin:8px 0 0}.note li{margin-bottom:4px}
+.note summary{cursor:pointer;color:var(--tx)}
+a{color:var(--bl)}
+code{background:var(--bg);border:1px solid var(--bd);border-radius:5px;padding:0 5px;font-size:12px}
+dialog{background:var(--pn);color:var(--tx);border:1px solid var(--bd);border-radius:14px;padding:22px;width:min(420px,92vw)}
+dialog::backdrop{background:#000a}
+dialog form{display:flex;flex-direction:column;gap:12px}
+dialog input,dialog select{width:100%}
+h2{font-size:16px;margin:0 0 12px}
+
+/* ---------- Celular ---------- */
+@media(max-width:760px){
+  body{flex-direction:column}
+  aside{width:100%;height:auto;position:sticky;top:0;z-index:5;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:10px 14px 8px;border-right:0;border-bottom:1px solid var(--bd)}
+  .logo{margin:0;font-size:15px;gap:8px}.logo i{font-size:22px}.logo br{display:none}
+  .dot{margin-left:2px}
+  .cur{margin:0 0 0 auto}
+  nav{display:flex;gap:4px;width:calc(100% + 28px);margin:0 -14px;padding:0 14px 2px;overflow-x:auto;scrollbar-width:none}
+  nav::-webkit-scrollbar{display:none}
+  nav button{width:auto;flex:none;white-space:nowrap;padding:7px 12px;font-size:13px;gap:6px}
+  #who{width:100%;margin:0;font-size:11px}#who:not(.err){display:none}
+  main{padding:16px 14px 48px}
+  h1{font-size:21px}.sub{margin-bottom:14px}
+  .card{padding:14px;border-radius:12px}
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:10px}
+  .k b{font-size:18px}.k span{font-size:11px}
+  .two{grid-template-columns:1fr;gap:10px;margin-top:10px}
+  input,select{font-size:16px;min-width:0;width:100%}
+  .row{gap:10px}.row>label{flex:1 1 140px}
+  .row>.btn{flex:1 1 auto}
+  .donut svg{width:150px}
+  /* tabelas viram cartões empilhados */
+  table.st{min-width:0}
+  table.st,table.st tbody,table.st tr,table.st td{display:block}
+  table.st tr:first-child{display:none}
+  table.st tr{padding:10px 0;border-bottom:1px solid var(--bd)}
+  table.st tr:last-child{border-bottom:0}
+  table.st td{display:flex;justify-content:space-between;align-items:center;gap:12px;border:0;padding:3px 0;text-align:right;overflow-wrap:anywhere}
+  table.st td::before{content:attr(data-l);color:var(--mu);font-size:12px;text-align:left;flex:none}
+  table.st td[data-l=""]{justify-content:flex-end}
+  table.st td[data-l=""]::before{content:none}
+  table.st td:empty{display:none}
+  .hd{margin-bottom:12px}.hd .sub{margin-bottom:2px}
+  .x{font-size:18px;padding:6px 10px}
+}
+@media(max-width:360px){.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<aside>
+  <div class="logo"><i>📈</i><span>Meu Trader <br>Control</span><span class="dot" id="dot" title=""></span></div>
+  <div class="cur" id="cur"><button data-c="BRL" class="on">R$</button><button data-c="USD">US$</button></div>
+  <nav id="nav"></nav><p class="note" id="who"></p>
+</aside>
+<main id="app"></main>
+<dialog id="dlg"></dialog>
+<script>
+const PAGES=[["dash","▦","Dashboard"],["resumo","▥","Resumo"],["res","↗","Resultados"],["cap","$","Capital"],["ir","▤","Imposto de Renda"],["caixa","▣","Caixa"],["saque","↘","Saque"],["sync","⚙","Sincronização"]];
+let S={trades:[],movs:[],cur:"BRL",rate:5.5,page:"dash",f:{p:"30",a:"",b:"",br:""}};
+const $=id=>document.getElementById(id);
+const ls={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
+let ready=false,MODE="local",GH=null,lastSnap="";
+try{GH=JSON.parse(ls.get("tc_gh")||"null")}catch(e){}
+
+/* ---------- Armazenamento: navegador + GitHub ---------- */
+const snap=()=>({trades:S.trades,movs:S.movs,cur:S.cur,rate:S.rate});
+const hasData=d=>d&&((d.trades||[]).length||(d.movs||[]).length);
+function apply(d){S.trades=d.trades||[];S.movs=d.movs||[];S.cur=d.cur||"BRL";S.rate=d.rate||5.5;lastSnap=JSON.stringify(snap());ls.set("tc_v1",lastSnap)}
+function status(t,k){const w=$("who"),d=$("dot");w.textContent=t;w.className="note"+(k==="err"?" err":"");d.className="dot "+(k||"");d.title=t}
+const setDirty=v=>v?ls.set("tc_dirty","1"):ls.del("tc_dirty");
+function save(){
+  if(!ready)return;
+  const j=JSON.stringify(snap());if(j===lastSnap)return;
+  lastSnap=j;ls.set("tc_v1",j);
+  if(MODE==="gh"){setDirty(true);schedule()}
+}
+const b64e=s=>{let x="";new TextEncoder().encode(s).forEach(c=>x+=String.fromCharCode(c));return btoa(x)};
+const b64d=s=>new TextDecoder().decode(Uint8Array.from(atob(s.replace(/\s/g,"")),c=>c.charCodeAt(0)));
+function api(method,body,url){
+  return fetch(url||`https://api.github.com/repos/${GH.repo}/contents/${GH.path||"dados.json"}`,{method,cache:"no-store",
+    keepalive:!!body&&JSON.stringify(body).length<60000,
+    headers:{Authorization:"Bearer "+GH.token,Accept:"application/vnd.github+json","X-GitHub-Api-Version":"2022-11-28"},
+    body:body?JSON.stringify(body):undefined});
+}
+const errMsg=s=>s===401?"token inválido ou expirado":s===403?"o token não tem permissão de escrita (Contents: Read and write) nesse repositório":s===404?"repositório não encontrado ou o token não tem acesso a ele":"erro "+s+" do GitHub";
+let ghSha=null,tmr=null,busy=false,again=false;
+async function ghLoad(){
+  let r;try{r=await api("GET")}catch(e){throw new Error("sem conexão com o GitHub")}
+  if(r.status===404){
+    const rr=await api("GET",null,`https://api.github.com/repos/${GH.repo}`);
+    if(!rr.ok)throw new Error(errMsg(rr.status));
+    return{data:null,sha:null};
+  }
+  if(!r.ok)throw new Error(errMsg(r.status));
+  const j=await r.json();
+  return{data:JSON.parse(b64d(j.content)||"{}"),sha:j.sha};
+}
+function schedule(){status("Salvando no GitHub…","sv");clearTimeout(tmr);tmr=setTimeout(push,1200)}
+async function push(){
+  clearTimeout(tmr);tmr=null;
+  if(busy){again=true;return}busy=true;
+  try{
+    const body={message:"Atualiza dados",content:b64e(JSON.stringify(snap(),null,1))};
+    if(ghSha)body.sha=ghSha;
+    let r=await api("PUT",body);
+    if(r.status===409||r.status===422){const x=await ghLoad();if(x.sha)body.sha=x.sha;else delete body.sha;r=await api("PUT",body)}
+    if(!r.ok)throw new Error(errMsg(r.status));
+    ghSha=(await r.json()).content.sha;setDirty(false);
+    status("Sincronizado com o GitHub","ok");
+  }catch(e){status("Não salvou no GitHub ("+e.message+"). Os dados estão guardados neste aparelho e serão enviados na próxima alteração.","err")}
+  busy=false;if(again){again=false;push()}
+}
+async function pull(){
+  status("Sincronizando…","sv");
+  const r=await ghLoad();ghSha=r.sha;
+  if(ls.get("tc_dirty")&&hasData(snap())){await push();return}
+  if(r.data)apply(r.data);else if(hasData(snap()))await push();
+  render();status("Sincronizado com o GitHub","ok");
+}
+async function connectGh(cfg){
+  const old=GH;GH=cfg;
+  let r;try{r=await ghLoad()}catch(e){GH=old;throw e}
+  ls.set("tc_gh",JSON.stringify(cfg));MODE="gh";ghSha=r.sha;
+  const mine=snap(),same=JSON.stringify(r.data||{})===JSON.stringify(mine);
+  if(r.data&&hasData(r.data)&&hasData(mine)&&!same&&!confirm("O GitHub já tem dados salvos. Substituir os dados deste aparelho pelos do GitHub?\n\nOK = usar os dados do GitHub\nCancelar = enviar os dados deste aparelho para o GitHub"))await push();
+  else if(r.data&&hasData(r.data))apply(r.data);
+  else if(hasData(mine))await push();
+  setDirty(false);S.page="dash";render();status("Sincronizado com o GitHub","ok");
+}
+document.addEventListener("visibilitychange",()=>{
+  if(MODE!=="gh")return;
+  if(document.visibilityState==="hidden"&&tmr)push();
+  else if(document.visibilityState==="visible"&&!tmr&&!busy)pull().catch(e=>status("Não foi possível atualizar: "+e.message,"err"));
+});
+window.addEventListener("beforeunload",e=>{if(tmr||busy){push();e.preventDefault();e.returnValue=""}});
+
+/* ---------- Utilidades ---------- */
+const uid=()=>Math.random().toString(36).slice(2,9);
+const iso=d=>d.toISOString().slice(0,10);
+const today=()=>{const d=new Date();return iso(new Date(d.getTime()-d.getTimezoneOffset()*60000))};
+const money=v=>{const x=S.cur==="USD"?v/S.rate:v;return new Intl.NumberFormat(S.cur==="USD"?"en-US":"pt-BR",{style:"currency",currency:S.cur}).format(x)};
+const pct=v=>(isFinite(v)?v:0).toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})+"%";
+const br=d=>d.split("-").reverse().join("/");
+const cls=v=>v>=0?"g":"r";
+const brokers=()=>[...new Set([...S.trades,...S.movs].map(x=>x.br))].filter(Boolean).sort();
+const brOpts=()=>`<option value="">Todas as corretoras</option>`+brokers().map(b=>`<option ${S.f.br===b?"selected":""}>${esc(b)}</option>`).join("");
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+function range(){
+  const f=S.f,t=new Date();let a,b=today();
+  if(f.p==="custom"){a=f.a||"0000-01-01";b=f.b||"9999-12-31"}
+  else if(f.p==="mes"){a=iso(new Date(t.getFullYear(),t.getMonth(),1))}
+  else if(f.p==="all"){a="0000-01-01"}
+  else{const d=new Date();d.setDate(d.getDate()-(+f.p));a=iso(d)}
+  return[a,b];
+}
+const inBr=x=>!S.f.br||x.br===S.f.br;
+function stats(){
+  const[a,b]=range();
+  const tr=S.trades.filter(t=>inBr(t)&&t.date>=a&&t.date<=b).sort((x,y)=>x.date.localeCompare(y.date));
+  const res=tr.reduce((s,t)=>s+t.v,0),w=tr.filter(t=>t.v>0),l=tr.filter(t=>t.v<0);
+  const net=(list,end)=>list.filter(x=>inBr(x)&&x.date<=end).reduce((s,x)=>s+(x.type==="saque"?-x.v:x.v),0);
+  const all=(end)=>net(S.movs,end)+S.trades.filter(t=>inBr(t)&&t.date<=end).reduce((s,t)=>s+t.v,0);
+  const dayBefore=new Date(a==="0000-01-01"?"1970-01-01":a);dayBefore.setDate(dayBefore.getDate()-1);
+  let base=all(iso(dayBefore));if(base<=0)base=S.movs.filter(x=>inBr(x)&&x.type==="aporte"&&x.date<=b).reduce((s,x)=>s+x.v,0);
+  const gw=w.reduce((s,t)=>s+t.v,0),gl=Math.abs(l.reduce((s,t)=>s+t.v,0));
+  return{tr,res,w:w.length,l:l.length,rate:tr.length?w.length/(w.length+l.length||1)*100:0,cap:all("9999-12-31"),rent:base>0?res/base*100:0,
+    avgW:w.length?gw/w.length:0,avgL:l.length?gl/l.length:0,pf:gl?gw/gl:0,best:Math.max(0,...tr.map(t=>t.v)),worst:Math.min(0,...tr.map(t=>t.v))};
+}
+function filters(){
+  const f=S.f;
+  return `<div class="card"><div class="row">
+  <label>Período<select id="fp"><option value="mes" ${f.p==="mes"?"selected":""}>Mês atual</option><option value="7" ${f.p==="7"?"selected":""}>Últimos 7 dias</option><option value="30" ${f.p==="30"?"selected":""}>Últimos 30 dias</option><option value="90" ${f.p==="90"?"selected":""}>Últimos 90 dias</option><option value="all" ${f.p==="all"?"selected":""}>Todo o histórico</option><option value="custom" ${f.p==="custom"?"selected":""}>Personalizado</option></select></label>
+  ${f.p==="custom"?`<label>Data inicial<input type="date" id="fa" value="${f.a}"></label><label>Data final<input type="date" id="fb" value="${f.b}"></label>`:""}
+  <label>Corretora<select id="fbr">${brOpts()}</select></label></div></div>`;
+}
+function bindFilters(){
+  const set=(id,k)=>$(id)&&$(id).addEventListener("change",e=>{S.f[k]=e.target.value;render()});
+  set("fp","p");set("fa","a");set("fb","b");set("fbr","br");
+}
+function chart(tr){
+  if(!tr.length)return `<div class="empty">Sem trades no período. Lance seu primeiro trade em Resultados.</div>`;
+  const byDay={};tr.forEach(t=>byDay[t.date]=(byDay[t.date]||0)+t.v);
+  let c=0;const pts=Object.keys(byDay).sort().map(d=>(c+=byDay[d],[d,c]));
+  const W=600,H=200,P=8,vs=pts.map(p=>p[1]).concat(0),mn=Math.min(...vs),mx=Math.max(...vs),sp=(mx-mn)||1;
+  const X=i=>P+(pts.length>1?i/(pts.length-1):.5)*(W-2*P),Y=v=>H-P-(v-mn)/sp*(H-2*P);
+  const line=pts.map((p,i)=>`${X(i)},${Y(p[1])}`).join(" ");
+  const col=c>=0?"#12e07a":"#ff4d55";
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Resultado acumulado"><line x1="0" x2="${W}" y1="${Y(0)}" y2="${Y(0)}" stroke="#242b36" stroke-dasharray="4"/><polygon points="${P},${Y(0)} ${line} ${X(pts.length-1)},${Y(0)}" fill="${col}" opacity=".12"/><polyline points="${line}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round"/>${pts.map((p,i)=>`<circle cx="${X(i)}" cy="${Y(p[1])}" r="3" fill="${col}"><title>${br(p[0])}: ${money(p[1])}</title></circle>`).join("")}</svg>`;
+}
+function donut(r){
+  const C=2*Math.PI*52,g=C*r/100;
+  return `<svg viewBox="0 0 140 140" width="170"><circle cx="70" cy="70" r="52" fill="none" stroke="#ff4d55" stroke-width="16"/><circle cx="70" cy="70" r="52" fill="none" stroke="#12e07a" stroke-width="16" stroke-dasharray="${g} ${C}" transform="rotate(-90 70 70)"/><text x="70" y="70" text-anchor="middle" fill="#e8ecf2" font-size="22" font-weight="700" font-family="Poppins,sans-serif">${r.toFixed(1)}%</text><text x="70" y="88" text-anchor="middle" fill="#8a94a3" font-size="9" font-family="Poppins,sans-serif">TAXA DE ACERTO</text></svg>`;
+}
+const head=(t,s,btn="")=>`<div class="row hd" style="justify-content:space-between;align-items:flex-start"><div><h1>${t}</h1><p class="sub">${s}</p></div>${btn}</div>`;
+
+const V={
+dash(){
+  const s=stats(),[a,b]=range();
+  const per=a.startsWith("0000")?"todo o histórico":`${br(a)} até ${br(b)}`;
+  const bys={};s.tr.forEach(t=>{const k=t.br||"—";bys[k]=bys[k]||{n:0,v:0};bys[k].n++;bys[k].v+=t.v});
+  return head("Dashboard","Visão geral dos seus resultados — "+per,`<button class="btn pri" data-act="novo">+ Novo trade</button>`)+filters()+`
+  <div class="grid">
+   <div class="card k ${s.res<0?"r":""}"><small>RESULTADO DO PERÍODO</small><b class="${cls(s.res)}">${money(s.res)}</b><span>${s.tr.length} trades no período</span></div>
+   <div class="card k"><small>RENTABILIDADE</small><b class="${cls(s.rent)}">${pct(s.rent)}</b><span>Sobre o capital no início do período</span></div>
+   <div class="card k b"><small>CAPITAL DISPONÍVEL</small><b>${money(s.cap)}</b><span>Aportes − saques + resultados</span></div>
+   <div class="card k a"><small>FATOR DE LUCRO</small><b>${s.pf?s.pf.toFixed(2):"—"}</b><span>Ganho total ÷ perda total</span></div>
+  </div>
+  <div class="two"><div class="card"><h2>Evolução do resultado</h2>${chart(s.tr)}</div>
+  <div class="card donut"><h2 style="align-self:flex-start">Assertividade</h2>${donut(s.rate)}<div class="wl"><div><small>WINS</small><b class="g">${s.w}</b></div><div><small>LOSSES</small><b class="r">${s.l}</b></div></div></div></div>
+  <div class="grid">
+   <div class="card"><small class="sub">Ganho médio</small><br><b class="g">${money(s.avgW)}</b></div>
+   <div class="card"><small class="sub">Perda média</small><br><b class="r">${money(-s.avgL)}</b></div>
+   <div class="card"><small class="sub">Melhor dia</small><br><b class="g">${money(s.best)}</b></div>
+   <div class="card"><small class="sub">Pior dia</small><br><b class="r">${money(s.worst)}</b></div></div>
+  <div class="card" style="margin-top:14px"><h2>Por corretora</h2>${Object.keys(bys).length?`<div class="wrap"><table><tr><th>Corretora</th><th class="n">Trades</th><th class="n">Resultado</th></tr>${Object.entries(bys).map(([k,x])=>`<tr><td>${esc(k)}</td><td class="n">${x.n}</td><td class="n ${cls(x.v)}">${money(x.v)}</td></tr>`).join("")}</table></div>`:`<div class="empty">Nenhum dado ainda.</div>`}</div>`;
+},
+resumo(){
+  const m={};S.trades.filter(inBr).forEach(t=>{const k=t.date.slice(0,7);m[k]=m[k]||{n:0,w:0,l:0,v:0};m[k].n++;m[k].v+=t.v;t.v>0?m[k].w++:t.v<0&&m[k].l++});
+  const ks=Object.keys(m).sort().reverse();
+  return head("Resumo","Desempenho mês a mês")+`<div class="card"><div class="row"><label>Corretora<select id="fbr">${brOpts()}</select></label></div></div><div class="card wrap" style="margin-top:14px">${ks.length?`<table><tr><th>Mês</th><th class="n">Trades</th><th class="n">Wins</th><th class="n">Losses</th><th class="n">Acerto</th><th class="n">Resultado</th></tr>${ks.map(k=>{const x=m[k];return `<tr><td>${k.split("-").reverse().join("/")}</td><td class="n">${x.n}</td><td class="n g">${x.w}</td><td class="n r">${x.l}</td><td class="n">${pct(x.w/((x.w+x.l)||1)*100)}</td><td class="n ${cls(x.v)}">${money(x.v)}</td></tr>`}).join("")}</table>`:`<div class="empty">Lance trades em Resultados para ver o resumo mensal.</div>`}</div>`;
+},
+res(){
+  const f=S.f,[a,b]=f.p==="custom"?range():["0000-01-01","9999-12-31"];
+  const tr=S.trades.filter(t=>inBr(t)&&t.date>=a&&t.date<=b).sort((x,y)=>y.date.localeCompare(x.date));
+  return head("Resultados diários","Gerencie seus lançamentos de trades",`<button class="btn pri" data-act="novo">+ Novo trade</button>`)+`<div class="card"><div class="row"><label>Corretora<select id="fbr">${brOpts()}</select></label><label>Data inicial<input type="date" id="fa" value="${f.a}"></label><label>Data final<input type="date" id="fb" value="${f.b}"></label><button class="btn" data-act="limpar">Limpar filtros</button></div></div>
+  <div class="card wrap" style="margin-top:14px">${tr.length?`<table><tr><th>Data</th><th>Corretora</th><th>Observação</th><th class="n">Valor</th><th>Resultado</th><th></th></tr>${tr.map(t=>`<tr><td>${br(t.date)}</td><td>${esc(t.br)}</td><td>${esc(t.note||"")}</td><td class="n ${cls(t.v)}">${money(t.v)}</td><td class="${cls(t.v)}">${t.v>0?"Win":t.v<0?"Loss":"Zero"}</td><td class="n"><button class="x" data-edit="t:${t.id}" aria-label="Editar">✎</button><button class="x" data-del="t:${t.id}" aria-label="Excluir">✕</button></td></tr>`).join("")}</table>`:`<div class="empty">Nenhum trade lançado. Clique em “Novo trade”.</div>`}</div>`;
+},
+cap(){
+  const ap=S.movs.filter(m=>m.type==="aporte"&&inBr(m)).reduce((s,m)=>s+m.v,0),sq=S.movs.filter(m=>m.type==="saque"&&inBr(m)).reduce((s,m)=>s+m.v,0),r=S.trades.filter(inBr).reduce((s,t)=>s+t.v,0);
+  const ev=[...S.movs.filter(inBr).map(m=>({d:m.date,v:m.type==="saque"?-m.v:m.v})),...S.trades.filter(inBr).map(t=>({d:t.date,v:t.v}))].sort((x,y)=>x.d.localeCompare(y.d));
+  let c=0;const pts=ev.map(e=>(c+=e.v,{date:e.d,v:e.v,c}));
+  return head("Capital","Evolução do seu patrimônio")+`<div class="card"><div class="row"><label>Corretora<select id="fbr">${brOpts()}</select></label></div></div><div class="grid">
+  <div class="card k b"><small>CAPITAL ATUAL</small><b>${money(ap-sq+r)}</b></div>
+  <div class="card k"><small>TOTAL APORTADO</small><b>${money(ap)}</b></div>
+  <div class="card k r"><small>TOTAL SACADO</small><b>${money(sq)}</b></div>
+  <div class="card k ${r<0?"r":""}"><small>RESULTADO ACUMULADO</small><b class="${cls(r)}">${money(r)}</b></div></div>
+  <div class="card" style="margin-top:14px"><h2>Curva de capital</h2>${chartCum(pts)}</div>`;
+},
+ir(){
+  const m={};S.trades.forEach(t=>{const k=t.date.slice(0,7);m[k]=(m[k]||0)+t.v});
+  const ks=Object.keys(m).sort();let carry=0;const rows=ks.map(k=>{const v=m[k];let base=0,use=0;if(v<0){carry+=-v}else{use=Math.min(carry,v);carry-=use;base=v-use}return{k,v,use,base,tax:base*.2,carry}}).reverse();
+  const tot=rows.reduce((s,r)=>s+r.tax,0);
+  return head("Imposto de Renda","Estimativa de imposto sobre day trade (alíquota de 20% sobre o lucro mensal)")+`<div class="grid" style="margin-top:0"><div class="card k a"><small>IMPOSTO ESTIMADO (TODO O HISTÓRICO)</small><b>${money(tot)}</b></div><div class="card k b"><small>PREJUÍZO A COMPENSAR</small><b>${money(carry)}</b></div></div>
+  <div class="card wrap" style="margin-top:14px">${rows.length?`<table><tr><th>Mês</th><th class="n">Resultado</th><th class="n">Prejuízo compensado</th><th class="n">Base de cálculo</th><th class="n">Imposto (20%)</th></tr>${rows.map(r=>`<tr><td>${r.k.split("-").reverse().join("/")}</td><td class="n ${cls(r.v)}">${money(r.v)}</td><td class="n">${money(r.use)}</td><td class="n">${money(r.base)}</td><td class="n"><b>${money(r.tax)}</b></td></tr>`).join("")}</table>`:`<div class="empty">Sem resultados lançados ainda.</div>`}</div>
+  <p class="note">Estimativa simplificada: soma o resultado de todas as corretoras no mês e compensa prejuízos de meses anteriores. Não considera corretagem, emolumentos nem IRRF retido. O DARF de day trade vence no último dia útil do mês seguinte. Confirme os valores com seu contador.</p>`;
+},
+caixa(){return movView("aporte")},
+saque(){return movView("saque")},
+sync(){
+  const on=MODE==="gh";
+  return head("Sincronização","Salve seus dados no GitHub para usar o mesmo histórico no notebook e no celular")+
+  `<div class="card" style="max-width:640px"><h2>${on?"✓ Conectado ao GitHub":"Conectar ao GitHub"}</h2>${on?
+   `<p class="sub">Repositório <b>${esc(GH.repo)}</b>, arquivo <code>${esc(GH.path||"dados.json")}</code>. Cada alteração é salva automaticamente.</p>
+    <div class="row"><button class="btn" data-act="ghnow">Sincronizar agora</button><button class="btn" data-act="ghoff">Desconectar este aparelho</button></div>`:
+   `<p class="sub">Sem conexão, os dados ficam salvos só neste navegador. Conecte cada aparelho (notebook e celular) ao mesmo repositório privado.</p>
+    <form id="ghf" class="col">
+     <label>Repositório privado (usuário/nome)<input name="repo" required autocapitalize="off" autocorrect="off" spellcheck="false" value="${esc((GH&&GH.repo)||"alexmatosz/meu-trader-dados")}"></label>
+     <label>Token de acesso do GitHub<input name="token" type="password" required autocomplete="off" placeholder="github_pat_…"></label>
+     <div class="row"><button class="btn pri" type="submit">Conectar</button></div>
+     <p class="note" id="gherr" style="margin:0"></p>
+    </form>
+    <details class="note"><summary>Como criar o token (uma vez só)</summary><ol>
+     <li>Abra <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com/settings/personal-access-tokens/new</a>.</li>
+     <li>Nome: <b>Meu Trader Control</b>. Expiração: a que preferir (ex.: 1 ano).</li>
+     <li>Em <b>Repository access</b>, escolha <b>Only select repositories</b> e marque o repositório de dados.</li>
+     <li>Em <b>Permissions → Repository permissions → Contents</b>, escolha <b>Read and write</b>.</li>
+     <li>Clique em <b>Generate token</b>, copie e cole aqui. Use o mesmo token no celular.</li>
+    </ol><p>O token fica guardado só neste navegador e só dá acesso a esse repositório.</p></details>`}
+  </div>
+  <div class="card" style="max-width:640px;margin-top:14px"><h2>Backup</h2><p class="sub">Baixe uma cópia dos seus lançamentos ou restaure uma cópia salva.</p>
+   <div class="row"><button class="btn" data-act="exp">Baixar backup</button><label class="btn">Importar backup<input type="file" id="imp" accept=".json,application/json" hidden></label></div></div>`;
+}
+};
+function chartCum(pts){
+  if(!pts.length)return `<div class="empty">Registre um aporte para começar a acompanhar seu capital.</div>`;
+  const W=600,H=200,P=8,mn=Math.min(0,...pts.map(p=>p.c)),mx=Math.max(...pts.map(p=>p.c)),sp=(mx-mn)||1;
+  const X=i=>P+(pts.length>1?i/(pts.length-1):.5)*(W-2*P),Y=v=>H-P-(v-mn)/sp*(H-2*P);
+  const l=pts.map((p,i)=>`${X(i)},${Y(p.c)}`).join(" ");
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Curva de capital"><polygon points="${P},${H-P} ${l} ${X(pts.length-1)},${H-P}" fill="#4aa8ff" opacity=".12"/><polyline points="${l}" fill="none" stroke="#4aa8ff" stroke-width="2.5" stroke-linejoin="round"/>${pts.map((p,i)=>`<circle cx="${X(i)}" cy="${Y(p.c)}" r="3" fill="#4aa8ff"><title>${br(p.date)}: ${money(p.c)}</title></circle>`).join("")}</svg>`;
+}
+function movView(type){
+  const L=S.movs.filter(m=>type==="aporte"?m.type==="aporte":m.type==="saque").sort((x,y)=>y.date.localeCompare(x.date));
+  const tot=L.reduce((s,m)=>s+m.v,0),nm=type==="aporte"?"Aporte":"Saque";
+  return head(type==="aporte"?"Caixa":"Saque",type==="aporte"?"Registre os aportes na sua conta de operação":"Registre as retiradas de dinheiro das corretoras",`<button class="btn pri" data-act="${type}">+ Novo ${nm.toLowerCase()}</button>`)+`<div class="card k ${type==="aporte"?"b":"r"}" style="max-width:300px"><small>TOTAL ${nm.toUpperCase()}S</small><b>${money(tot)}</b></div>
+  <div class="card wrap" style="margin-top:14px">${L.length?`<table><tr><th>Data</th><th>Corretora</th><th>Observação</th><th class="n">Valor</th><th></th></tr>${L.map(m=>`<tr><td>${br(m.date)}</td><td>${esc(m.br)}</td><td>${esc(m.note||"")}</td><td class="n">${money(m.v)}</td><td class="n"><button class="x" data-edit="m:${m.id}" aria-label="Editar">✎</button><button class="x" data-del="m:${m.id}" aria-label="Excluir">✕</button></td></tr>`).join("")}</table>`:`<div class="empty">Nenhum ${nm.toLowerCase()} registrado.</div>`}</div>`;
+}
+function render(){if(!ready)return;
+  $("nav").innerHTML=PAGES.map(p=>`<button data-p="${p[0]}" class="${S.page===p[0]?"on":""}"><span aria-hidden="true">${p[1]}</span>${p[2]}</button>`).join("");
+  document.querySelectorAll("#cur button").forEach(b=>b.classList.toggle("on",b.dataset.c===S.cur));
+  $("app").innerHTML=V[S.page]()+(S.cur==="USD"?`<p class="note">Valores convertidos com dólar a R$ ${S.rate.toFixed(2).replace(".",",")}. <button class="btn" data-act="rate">Alterar cotação</button></p>`:"");
+  bindFilters();
+  // rótulos para as tabelas virarem cartões no celular
+  document.querySelectorAll("#app table").forEach(t=>{t.classList.add("st");const h=[...t.rows[0].cells].map(c=>c.textContent.trim());[...t.rows].slice(1).forEach(r=>[...r.cells].forEach((c,i)=>c.dataset.l=h[i]||""))});
+  const on=$("nav").querySelector(".on");if(on&&on.scrollIntoView&&innerWidth<=760)on.scrollIntoView({block:"nearest",inline:"nearest"});
+}
+function form(title,fields,onOk){
+  const d=$("dlg");
+  d.innerHTML=`<form method="dialog" id="fm"><h2>${title}</h2>${fields}<div class="row" style="justify-content:flex-end"><button class="btn" value="x" type="button" id="cn">Cancelar</button><button class="btn pri" type="submit">Salvar</button></div></form>`;
+  d.showModal();
+  d.querySelector("#cn").onclick=()=>d.close();
+  d.querySelector("#fm").onsubmit=e=>{e.preventDefault();const r=onOk(new FormData(e.target));if(r!==false){d.close();save();render()}};
+}
+const brField=()=>`<label>Corretora<input name="br" list="bl" required placeholder="Ex.: minha corretora"><datalist id="bl">${brokers().map(b=>`<option value="${esc(b)}">`).join("")}</datalist></label>`;
+const num=v=>parseFloat(String(v).replace(/\./g,"").replace(",","."));
+const val=(l,h="")=>`<label>${l}<input name="v" required inputmode="decimal" placeholder="${h}"></label>`;
+document.addEventListener("click",e=>{
+  const t=e.target.closest("button");if(!t)return;
+  if(t.dataset.p){S.page=t.dataset.p;render();scrollTo(0,0);return}
+  if(t.dataset.c){S.cur=t.dataset.c;save();render();return}
+  if(t.dataset.del){const[k,id]=t.dataset.del.split(":");if(confirm("Excluir este lançamento?")){S[k==="t"?"trades":"movs"]=S[k==="t"?"trades":"movs"].filter(x=>x.id!==id);save();render()}return}
+  if(t.dataset.edit){const[k,id]=t.dataset.edit.split(":");const it=(k==="t"?S.trades:S.movs).find(x=>x.id===id);if(!it)return;const sh=Math.round((S.cur==="USD"?it.v/S.rate:it.v)*100)/100;form("Editar lançamento",`<label>Data<input type="date" name="d" value="${it.date}" required></label>${brField().replace('name="br"','name="br" value="'+esc(it.br)+'"')}${val("Valor","").replace('name="v"','name="v" value="'+String(sh).replace(".",",")+'"')}<label>Observação<input name="n" value="${esc(it.note||"")}"></label>`,fd=>{const v=num(fd.get("v"));if(isNaN(v))return alert("Informe um valor válido.")||false;it.date=fd.get("d");it.br=fd.get("br").trim();it.v=(S.cur==="USD"?v*S.rate:v);if(k==="m")it.v=Math.abs(it.v);it.note=fd.get("n")});return}
+  const a=t.dataset.act;if(!a)return;
+  if(a==="novo")form("Novo trade",`<label>Data<input type="date" name="d" value="${today()}" required></label>${brField()}${val("Resultado do dia (use − para loss)","Ex.: 450,00 ou -120,00")}<label>Observação<input name="n" placeholder="Ativo, estratégia…"></label>`,fd=>{const v=num(fd.get("v"));if(isNaN(v))return alert("Informe um valor válido.")||false;S.trades.push({id:uid(),date:fd.get("d"),br:fd.get("br").trim(),v:S.cur==="USD"?v*S.rate:v,note:fd.get("n")})});
+  if(a==="aporte"||a==="saque")form(a==="aporte"?"Novo aporte":"Novo saque",`<label>Data<input type="date" name="d" value="${today()}" required></label>${brField()}${val("Valor","Ex.: 5000,00")}<label>Observação<input name="n"></label>`,fd=>{const v=Math.abs(num(fd.get("v")));if(isNaN(v))return alert("Informe um valor válido.")||false;S.movs.push({id:uid(),type:a,date:fd.get("d"),br:fd.get("br").trim(),v:S.cur==="USD"?v*S.rate:v,note:fd.get("n")})});
+  if(a==="limpar"){S.f={p:"all",a:"",b:"",br:""};render()}
+  if(a==="rate"){const r=num(prompt("Cotação do dólar em reais:",String(S.rate).replace(".",",")));if(r>0){S.rate=r;save();render()}}
+  if(a==="ghnow")pull().catch(x=>status("Não foi possível sincronizar: "+x.message,"err"));
+  if(a==="ghoff"&&confirm("Desconectar este aparelho do GitHub? Os dados continuam salvos no GitHub e neste navegador.")){ls.del("tc_gh");ls.del("tc_dirty");GH=null;MODE="local";clearTimeout(tmr);tmr=null;render();status("Dados salvos só neste navegador.","")}
+  if(a==="exp"){const l=document.createElement("a");l.href=URL.createObjectURL(new Blob([JSON.stringify(snap(),null,1)],{type:"application/json"}));l.download="meu-trader-backup-"+today()+".json";l.click()}
+});
+document.addEventListener("submit",async e=>{
+  if(e.target.id!=="ghf")return;e.preventDefault();
+  const fd=new FormData(e.target),err=$("gherr"),btn=e.target.querySelector("button[type=submit]");
+  const cfg={repo:fd.get("repo").trim().replace(/^https?:\/\/github\.com\//,"").replace(/\.git$|\/$/g,""),token:fd.get("token").trim(),path:"dados.json"};
+  err.style.color="";err.textContent="Conectando…";btn.disabled=true;
+  try{await connectGh(cfg)}catch(x){err.style.color="var(--rd)";err.textContent="Não foi possível conectar: "+x.message+".";btn.disabled=false}
+});
+document.addEventListener("change",e=>{
+  if(e.target.id!=="imp"||!e.target.files[0])return;
+  e.target.files[0].text().then(txt=>{
+    const d=JSON.parse(txt);if(!Array.isArray(d.trades)||!Array.isArray(d.movs))throw new Error("formato");
+    if(!confirm(`Substituir todos os dados atuais pelo backup (${d.trades.length} trades, ${d.movs.length} movimentações)?`))return;
+    S.trades=d.trades;S.movs=d.movs;S.cur=d.cur||S.cur;S.rate=d.rate||S.rate;save();S.page="dash";render();
+  }).catch(()=>alert("Arquivo de backup inválido."));
+});
+
+/* ---------- Início ---------- */
+(async()=>{
+  try{const s=ls.get("tc_v1");if(s)apply(JSON.parse(s))}catch(e){}
+  if(!ls.get("tc_seen")&&!(GH&&GH.token)){S.page="sync";ls.set("tc_seen","1")}
+  ready=true;
+  if(GH&&GH.token){MODE="gh";render();try{await pull()}catch(e){status("Sem sincronizar ("+e.message+"). Mostrando a cópia deste aparelho.","err")}}
+  else{render();status("Dados salvos só neste navegador. Conecte o GitHub em Sincronização.","")}
+})();
+</script>
+</body>
+</html>
