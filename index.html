@@ -168,7 +168,7 @@ async function push(){
     if(!r.ok)throw new Error(errMsg(r.status));
     ghSha=(await r.json()).content.sha;setDirty(false);
     status("Sincronizado com o GitHub","ok");
-  }catch(e){status("Não salvou no GitHub ("+e.message+"). Os dados estão guardados neste aparelho e serão enviados na próxima alteração.","err")}
+  }catch(e){status("Não salvou no GitHub ("+e.message+"). Os dados estão guardados neste aparelho"+(/token/.test(e.message)?". Troque o token em ⚙ Sincronização para enviá-los.":" e serão enviados na próxima alteração."),"err")}
   busy=false;if(again){again=false;push()}
 }
 async function pull(){
@@ -183,7 +183,8 @@ async function connectGh(cfg){
   let r;try{r=await ghLoad()}catch(e){GH=old;throw e}
   ls.set("tc_gh",JSON.stringify(cfg));MODE="gh";ghSha=r.sha;
   const mine=snap(),same=JSON.stringify(r.data||{})===JSON.stringify(mine);
-  if(r.data&&hasData(r.data)&&hasData(mine)&&!same&&!confirm("O GitHub já tem dados salvos. Substituir os dados deste aparelho pelos do GitHub?\n\nOK = usar os dados do GitHub\nCancelar = enviar os dados deste aparelho para o GitHub"))await push();
+  if(ls.get("tc_dirty")&&hasData(mine))await push();
+  else if(r.data&&hasData(r.data)&&hasData(mine)&&!same&&!confirm("O GitHub já tem dados salvos. Substituir os dados deste aparelho pelos do GitHub?\n\nOK = usar os dados do GitHub\nCancelar = enviar os dados deste aparelho para o GitHub"))await push();
   else if(r.data&&hasData(r.data))apply(r.data);
   else if(hasData(mine))await push();
   setDirty(false);S.page="dash";render();status("Sincronizado com o GitHub","ok");
@@ -313,7 +314,13 @@ sync(){
   return head("Sincronização","Salve seus dados no GitHub para usar o mesmo histórico no notebook e no celular")+
   `<div class="card" style="max-width:640px"><h2>${on?"✓ Conectado ao GitHub":"Conectar ao GitHub"}</h2>${on?
    `<p class="sub">Repositório <b>${esc(GH.repo)}</b>, arquivo <code>${esc(GH.path||"dados.json")}</code>. Cada alteração é salva automaticamente.</p>
-    <div class="row"><button class="btn" data-act="ghnow">Sincronizar agora</button><button class="btn" data-act="ghoff">Desconectar este aparelho</button></div>`:
+    <div class="row"><button class="btn" data-act="ghnow">Sincronizar agora</button><button class="btn" data-act="ghoff">Desconectar este aparelho</button></div>
+    <details class="note"${$("dot").classList.contains("err")?" open":""}><summary>Trocar token (quando o atual expirar)</summary>
+     <form id="ghf" class="col" style="margin-top:10px"><input type="hidden" name="repo" value="${esc(GH.repo)}">
+      <label>Novo token<input name="token" type="password" required autocomplete="off" placeholder="github_pat_…"></label>
+      <div class="row"><button class="btn pri" type="submit">Salvar novo token</button></div>
+      <p class="note" id="gherr" style="margin:0"></p></form>
+     <p>Os lançamentos feitos enquanto o token estava vencido ficam neste aparelho e são enviados ao salvar o novo token.</p></details>`:
    `<p class="sub">Sem conexão, os dados ficam salvos só neste navegador. Conecte cada aparelho (notebook e celular) ao mesmo repositório privado.</p>
     <form id="ghf" class="col">
      <label>Repositório privado (usuário/nome)<input name="repo" required autocapitalize="off" autocorrect="off" spellcheck="false" value="${esc((GH&&GH.repo)||"alexmatosz/meu-trader-dados")}"></label>
@@ -377,7 +384,7 @@ document.addEventListener("click",e=>{
   if(a==="limpar"){S.f={p:"all",a:"",b:"",br:""};render()}
   if(a==="rate"){const r=num(prompt("Cotação do dólar em reais:",String(S.rate).replace(".",",")));if(r>0){S.rate=r;save();render()}}
   if(a==="ghnow")pull().catch(x=>status("Não foi possível sincronizar: "+x.message,"err"));
-  if(a==="ghoff"&&confirm("Desconectar este aparelho do GitHub? Os dados continuam salvos no GitHub e neste navegador.")){ls.del("tc_gh");ls.del("tc_dirty");GH=null;MODE="local";clearTimeout(tmr);tmr=null;render();status("Dados salvos só neste navegador.","")}
+  if(a==="ghoff"&&confirm("Desconectar este aparelho do GitHub? Os dados continuam salvos no GitHub e neste navegador.")){ls.del("tc_gh");GH=null;MODE="local";clearTimeout(tmr);tmr=null;render();status("Dados salvos só neste navegador.","")}
   if(a==="exp"){const l=document.createElement("a");l.href=URL.createObjectURL(new Blob([JSON.stringify(snap(),null,1)],{type:"application/json"}));l.download="meu-trader-backup-"+today()+".json";l.click()}
 });
 document.addEventListener("submit",async e=>{
